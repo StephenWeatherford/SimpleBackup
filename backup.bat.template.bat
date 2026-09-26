@@ -9,4 +9,3 @@ if not exist "%ps1Path%" (
 )
 
 powershell -ExecutionPolicy Bypass -File "%ps1Path%" "%CD%" "%extensions%"
-rem pause

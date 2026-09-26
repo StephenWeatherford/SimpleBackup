@@ -1,10 +1,8 @@
+# Backups up files in the source directory to a "Backup" folder
 param(
     [string]$sourceDir,
     [string]$extensionsCsv
 )
-
-write-warning "sourceDir = $sourceDir"    
-write-warning "extensionsCsv = $extensionsCsv"
 
 # Convert comma-separated extensions into an array
 $extensions = $extensionsCsv -split ','
@@ -20,6 +18,8 @@ $timestamp = (Get-Date).ToString("yyyy-MM-dd-HHmmss")
 
 Write-Host "Copying files from:"
 Write-Host "  $sourceDir" -ForegroundColor Cyan
+Write-Host "to"
+Write-Host "  $backupDir" -ForegroundColor Cyan
 Write-Host "Extensions:"
 Write-Host "  $extensionsCsv"
 Write-Host ""
@@ -32,11 +32,16 @@ $files = foreach ($ext in $extensions) {
 # Automatically ignore the batch file itself
 $files = $files | Where-Object { $_.Name -ne "RunBackup.bat" }
 
+Write-Host "Backed up:"
+
 foreach ($file in $files) {
     $newName = "$timestamp-$($file.Name)"
     $destPath = Join-Path $backupDir $newName
     Copy-Item $file.FullName $destPath
-    Write-Host "  $destPath"
+
+    # Show path relative to the source folder
+    $relativePath = $destPath.Substring($sourceDir.TrimEnd('\').Length).TrimStart('\')
+    Write-Host "  $relativePath" -ForegroundColor Blue
 }
 
 Write-Host ""
